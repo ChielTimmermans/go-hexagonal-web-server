@@ -1,0 +1,48 @@
+[server]
+name = "Go-hexagonal server"
+url = "localhost:20000" 
+port = 8080
+maxRequestBodySize = 20000000
+
+[client]
+readTimeout = 10000000000
+readBufferSize = 0
+writeTimeout = 10000000000
+writeBufferSize = 0
+
+
+[cors]
+allowedOrigins=["http://localhost:20020","http://localhost:20002","http://localhost:20003"]
+AllowedHeaders=["content-type", "x-api-key", "accept-language"]
+AllowCredentials=true
+AllowMaxAge=5600
+Debug=true
+
+[language]
+availableLanguages=
+defaultLanguage=
+
+[mail]
+identity=
+username=
+password=
+host=
+from=
+port=
+
+[router]
+redirectTrailingSlash = false
+redirectFixedPath = false
+handleMethodNotAllowed = false
+handleOPTIONS = false
+
+[DBPostgres]
+hostname = "db"
+port = 5432
+user = "postgres"    
+password = "testing"
+database = "gohexagonal"
+
+[url]
+app="http://localhost:10020"
+dashboard="http://localhost:10030"

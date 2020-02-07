@@ -1,0 +1,72 @@
+version: "3"
+
+# Define services
+services:
+  # App Service
+  app:
+    # Configuration for building the docker image for the service
+    image: go-hexagonal:latest
+    ports:
+      - "20000:8080" # Forward the exposed port 8080 on the container to port 8080 on the host machine
+    restart: unless-stopped
+    volumes:
+      - ./:/go-hexagonal
+      - media:/files
+    depends_on:
+      - db # This service depends on db. Start that first.
+    networks: # Networks to join (Services on the same network can communicate with each other using their name)
+      - backend
+
+  # Ingress service
+  files:
+    image: nginx:alpine
+    restart: unless-stopped
+    ports:
+      - 20103:80
+    volumes:
+      - ./.docker/nginx/conf.d/:/etc/nginx/conf.d/
+      - media:/var/www/media
+    networks:
+      - backend
+
+  # DB Service
+  db:
+    image: "postgres"
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: testing
+      POSTGRES_DB: qrlink
+    networks:
+      - backend
+    volumes:
+      - /var/lib/postgresql/data
+      - ./.docker/sql/:/docker-entrypoint-initdb.d/
+
+  swagger-editor:
+    image: swaggerapi/swagger-editor
+    ports:
+      - "20002:8080"
+
+  swagger-ui:
+    image: swaggerapi/swagger-ui
+    ports:
+      - "20003:8080"
+    volumes:
+      - ./docs:/docs
+    environment:
+      SWAGGER_JSON: /docs/openapi.yaml
+
+  swagger-api:
+    image: stoplight/prism:3
+    ports:
+      - "20001:4010"
+    volumes:
+      - ./docs:/docs
+    command: mock -d -h 0.0.0.0 "/docs/openapi.yaml"
+
+networks:
+  backend:
+volumes:
+  pgdata:
+  media:

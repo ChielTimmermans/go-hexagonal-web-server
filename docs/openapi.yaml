@@ -1,0 +1,176 @@
+openapi: 3.0.0
+info:
+  title: qrlink
+  description: API documentation for qrlink
+  version: 0.1.0
+servers:
+  - url: https://api.qrlink.nl
+    description: Production server
+  - url: https://api.qa.qrlink.nl
+    description: Internal staging server for quality assurance
+  - url: https://api.dev.qrlink.nl
+    description: Internal development server for testing
+  - url: http://localhost:10100
+    description: Local development server for testing
+  - url: http://localhost:10101
+    description: Local mock server for testing
+
+components:
+  schemas:
+    Language:
+      type: string
+      description: Language
+      example: NLD
+      enum:
+        - NLD
+        - ENG
+
+    Country:
+      type: object
+      properties:
+        id:
+          type: string
+          x-faker: address.countryCode
+          description: "Country ID in the following format: [ISO 3166-1 Alpha-2 code](https://en.wikipedia.org/wiki/ISO_3166-1). **XX** country code contains International leagues like 'Europa League' and 'Champions league'. These leagues can't be bind to countries so this will be grouped under 'XX'"
+          example: NL
+          readOnly: true
+        text:
+          type: string
+          x-faker: address.country
+          description: Country text
+          example: Netherlands
+          readOnly: true
+
+    ErrorCode:
+      type: string
+      description: >
+        Application specific error code:
+         * `account_not_found` - Account not found, this account could not be found.
+         * `coin_balance_insufficient` - Insufficient coin balance, this account does not have sufficient coin balance to buy this item.
+      enum:
+        - "account_not_found"
+        - "insufficient_coins"
+
+    HTTPStatusCode:
+      type: string
+      description: >
+        HTTP status code:
+         * `200` - OK, the request has succeeded.
+         * `201` - Created, the request has been fulfilled and resulted in a new resource being created. 
+         * `204` - No Content, The server has fulfilled the request but does not need to return an entity-body, for example when a DELETE request is executed there is no content to return.
+         * `304` - Not Modified, the resource has not been modified since last requested.
+         * `400` - Bad Request, the request was unacceptable, often due to missing a required parameter.
+         * `401` - Unauthorized, no valid API key provided.
+         * `403` - Forbidden, the API key doesn't have permissions to perform the request.
+         * `404` - Not Found, the requested resource doesn't exist.
+         * `409` - Conflict, the request conflicts with another request.
+         * `413` - Request Entity Too Large, the server refuses to handle this request because it is too large.
+         * `429` - Too Many Requests, too many requests hit the API too quickly. 
+         * `500` - Internal Server Error, something went wrong on seat manager's end.
+         * `502` - Bad Gateway, the server, while acting as a gateway or proxy, received an invalid response from the upstream server it accessed in attempting to fulfill the request.
+         * `503` - Service Unavailable, the server is currently unable to handle the request due to a temporary overloading or maintenance of the server.
+         * `504` - Gateway Timeout, the server, while acting as a gateway or proxy, did not receive a timely response from the upstream server.
+      example: "404"
+      enum:
+        - "200"
+        - "201"
+        - "204"
+        - "304"
+        - "400"
+        - "401"
+        - "403"
+        - "404"
+        - "409"
+        - "413"
+        - "429"
+        - "500"
+        - "502"
+        - "503"
+        - "504"
+
+    Error:
+      type: object
+      description: When a server encounters multiple problems for a single request, the most generally applicable HTTP error code SHOULD be used in the response. For instance, 400 Bad Request might be appropriate for multiple 4xx errors or 500 Internal Server Error might be appropriate for multiple 5xx errors.
+      properties:
+        code:
+          $ref: "#/components/schemas/ErrorCode"
+        title:
+          type: string
+          description: A short, human-readable summary of the problem that SHOULD NOT change from occurrence to occurrence of the problem, except for purposes of localization.
+          example: "Account not found"
+        detail:
+          type: string
+          description: A human-readable explanation specific to this occurrence, can be localized.
+          example: "This account could not be found."
+        source:
+          type: object
+          properties:
+            pointer:
+              type: string
+              description: A JSON Pointer to the associated entity in the request document
+              example: "/data/account/username"
+            parameter:
+              type: string
+              description: A string indicating which URI query parameter caused the error
+              example: "filter"
+
+    Customer:
+      type: object
+      required:
+        - name
+      properties:
+        id:
+          type: integer
+          x-faker: random.number
+          description: ID of customer
+          example: 1523
+          readOnly: true
+        name:
+          type: string
+          pattern: "^[a-zA-Z0-9-_]+$"
+          x-faker: internet.companyName
+          description: Name of customer
+          example: AceWorks
+          readOnly: false
+        phone_number:
+          type: string
+          x-faker: phone.phoneNumber
+          description: Phone number of customer
+          example: contact@aceworks.nl
+          readOnly: false
+        default_link:
+          type: string
+          x-faker: internet.url
+          description: default link of customer
+          example: https://google.nl
+          readOnly: false
+        primary_color:
+          type: string
+          x-faker: internet.color
+          description: Primary color of customer
+          example: \#FFFFFF
+        secondary_color:
+          type: string
+          x-faker: internet.color
+          description: Primary color of customer
+          example: \#FFFFFF
+        tertairy_color:
+          type: string
+          x-faker: internet.color
+          description: Primary color of customer
+          example: \#FFFFFF
+        created_at:
+          type: string
+          format: date-time
+          description: Date of creation of customer
+          example: 2020-02-03 13:35:07
+        updated_at:
+          type: string
+          format: date-time
+          description: Date of last update of customer
+          example: 2020-02-03 13:35:07
+        deleted_at:
+          type: string
+          format: date-time
+          description: Date of deletion of customer
+          example: 2020-02-03 13:35:07
